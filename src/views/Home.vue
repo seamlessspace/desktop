@@ -1,19 +1,14 @@
 <template>
-  <div class="home">
-    Hello world
-  </div>
+    <div class="home">
+        <nav-bar></nav-bar>
+    </div>
 </template>
 
 <script>
-import createSocket from '../serve/socket';
-import pdfjs from 'pdfjs-dist';
-import getPdf from '../serve/api';
+import NavBar from '../components/NavBar.vue';
 
 export default {
     name: 'home',
-    components: {},
-    created() {
-        getPdf();
-    },
+    components: { NavBar },
 };
 </script>

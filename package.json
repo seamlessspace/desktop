@@ -12,6 +12,9 @@
     "postuninstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
+    "@fortawesome/free-solid-svg-icons": "^5.7.2",
+    "@fortawesome/vue-fontawesome": "^0.1.5",
     "axios": "^0.18.0",
     "pdfjs-dist": "^2.0.943",
     "socket.io-client": "^2.2.0",
