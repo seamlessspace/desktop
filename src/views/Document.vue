@@ -13,7 +13,7 @@ export default {
     name: 'Document',
     mounted() {
         getPdfPage({
-            url: pdfUrl,
+            url: 'file:///Users/billyzou/Desktop/learnspace.pdf',
             pageNumber: 1,
             scale: 1.5,
             canvas: this.$refs.doc,
