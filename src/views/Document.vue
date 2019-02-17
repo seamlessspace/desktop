@@ -118,7 +118,11 @@ export default {
                     path: localPath,
                     name: fileName,
                 },
+                info: Object.assign(requestFileRes.data, {
+                    file_state: res.file_state,
+                }),
             };
+            console.log(newFile);
             this.$store.commit('addFile', newFile);
             this.$store.commit('openFile', newFile);
             this.handleRefresh();

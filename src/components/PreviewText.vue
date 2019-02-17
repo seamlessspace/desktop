@@ -1,5 +1,6 @@
 <template>
-    <textarea class="txt" v-model="textValue" ref="text" @keyup="findCursor" @click="findCursor"></textarea>
+    <textarea class="txt" v-model="textValue" ref="text" @keyup="findCursor" @click="findCursor">
+    </textarea>
 </template>
 
 <script>
@@ -27,11 +28,12 @@ export default {
     mounted() {
         setTimeout(() => {
             if (this.fileExt.info.file_state) {
-                const pos = this.fileExt.info.file_state.cursor;
+                const pos = parseInt(this.fileExt.info.file_state.cursor, 10);
+                console.log(pos);
                 this.$refs.text.focus();
                 this.$refs.text.setSelectionRange(pos, pos);
             }
-        }, 10);
+        }, 100);
     },
 };
 </script>
