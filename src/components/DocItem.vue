@@ -1,10 +1,10 @@
 <template>
-    <div class="card">
+    <div class="card" @click="viewDocument">
         <div class="card__thumbnail">
             <canvas ref="doc"></canvas>
         </div>
         <div class="info">
-            <div class="info__title">{{file.name}}</div>
+            <div class="info__title">{{fileExt.file.name}}</div>
             <div class="info__support">
                 <img src="../assets/image/icon/pdf.png" class="info__icon" />
                 <p class="info__modified">Modified 2 days ago</p>
@@ -21,11 +21,18 @@ import getPdfPage from '../utils/loadPdf';
 export default {
     name: 'DocItem',
     props: {
-        file: File,
+        fileExt: Object,
+    },
+    methods: {
+        viewDocument() {
+            this.$store.commit('openFile', this.fileExt);
+            this.$router.push('/document');
+        },
     },
     mounted() {
+        const { file } = this.fileExt;
         getPdfPage({
-            filePath: this.file.path,
+            filePath: file.path,
             pageNumber: 1,
             canvas: this.$refs.doc,
             canvasWidth: 250,

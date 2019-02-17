@@ -2,7 +2,8 @@
     <section class="doc" v-if="files.length > 0">
         <h2 class="doc__title">{{type}}</h2>
         <div class="doc__list">
-            <doc-item v-for="(file, index) in files" :file="file" :key="index"></doc-item>
+            <doc-item v-for="(fileExt, index) in files" :fileExt="fileExt" :key="index">
+            </doc-item>
         </div>
     </section>
 </template>

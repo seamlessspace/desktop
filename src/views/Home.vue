@@ -8,10 +8,16 @@
 <script>
 import NavBar from '../components/NavBar.vue';
 import DocList from '../components/DocList.vue';
+import { uploadFile } from '../serve/api';
 
-function getSuffix(fileName) {
-    const afterSplit = fileName.split('.');
+function getSuffix(file) {
+    const afterSplit = file.name.split('.');
     return afterSplit[afterSplit.length - 1].toLowerCase();
+}
+
+function isValidFile(file) {
+    const suffix = getSuffix(file);
+    return !(suffix !== 'pdf' && suffix !== 'txt');
 }
 
 export default {
@@ -21,11 +27,18 @@ export default {
     created() {
         const { body } = document;
         const preventHandler = e => e.preventDefault();
-        const dropHandler = (event) => {
+        const dropHandler = async (event) => {
             event.preventDefault();
             const file = event.dataTransfer.files[0];
-            file.fileType = getSuffix(file.name);
-            this.$store.commit('addFile', file);
+            if (!isValidFile(file)) {
+                return;
+            }
+            const res = await uploadFile(file);
+            const fileExt = {
+                file,
+                info: res.data,
+            };
+            this.$store.commit('addFile', fileExt);
         };
         body.addEventListener('dragover', preventHandler);
         body.addEventListener('dragleave', preventHandler);

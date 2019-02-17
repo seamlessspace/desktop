@@ -1,27 +1,52 @@
 <template>
     <div>
-        <h1>My PDF document</h1>
+        <nav class="nav">
+            <font-awesome-icon :icon="['fas', 'chevron-left']" class="nav__back"
+                               @click="$router.push('/')">
+            </font-awesome-icon>
+            <h1 class="nav__title">Learn Space</h1>
+        </nav>
         <canvas ref="doc"></canvas>
     </div>
 </template>
 
 <script>
-import pdfUrl from '../serve/api';
-import getPdfPage from '../utils/loadPdf';
+import createSocket from '../serve/socket';
+import { getAllDevices, uploadFile } from '../serve/api';
 
 export default {
     name: 'Document',
-    mounted() {
-        getPdfPage({
-            url: 'file:///Users/billyzou/Desktop/learnspace.pdf',
-            pageNumber: 1,
-            scale: 1.5,
-            canvas: this.$refs.doc,
-        });
+    data() {
+        return {
+            socket: null,
+            devices: null,
+        };
+    },
+    created() {
+        // this.socket = createSocket();
     },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    .nav {
+        position: sticky;
+        height: 60px;
+        background-color: #e6e6e6;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+    }
 
+    .nav__back {
+        color: #535353;
+        font-size: 20px;
+    }
+
+    .nav__title {
+        color: #676767;
+        font-size: 20px;
+        margin-left: 15px;
+        font-weight: normal;
+    }
 </style>

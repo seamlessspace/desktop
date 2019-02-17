@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faSearch,
     faEllipsisV,
+    faChevronLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import App from './App.vue';
 import router from './router';
@@ -12,6 +13,7 @@ import store from './store';
 library.add(
     faSearch,
     faEllipsisV,
+    faChevronLeft,
 );
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
