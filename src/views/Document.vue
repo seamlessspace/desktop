@@ -12,11 +12,11 @@
                     Opened Tags ({{$store.state.files.pdf.length + $store.state.files.txt.length}})
                 </p>
                 <tag-item v-for="(pdfFileExt, pdfIndex) in $store.state.files.pdf"
-                          :file="pdfFileExt.file" :active="pdfFileExt === $store.state.currentFile"
-                          :key="pdfIndex">
+                          :file-ext="pdfFileExt" :active="pdfFileExt === $store.state.currentFile"
+                          :key="pdfIndex" @refresh="handleRefresh">
                 </tag-item>
                 <tag-item v-for="(txtFileExt, txtIndex) in $store.state.files.txt"
-                          :file="txtFileExt.file" :active="txtFileExt === $store.state.currentFile"
+                          :file-ext="txtFileExt" :active="txtFileExt === $store.state.currentFile"
                           :key="txtIndex + $store.state.files.pdf.length"></tag-item>
             </aside>
             <div class="preview" ref="preview" v-if="isPdfFile($store.state.currentFile.file)">
@@ -36,7 +36,7 @@ import { getAllDevices, sendFileToAnotherDevice } from '../serve/api';
 import { getPdfPagePromises } from '../utils/loadPdf';
 import TagItem from '../components/TagItem.vue';
 import PreviewPage from '../components/PreviewPage.vue';
-import PreviewText from '../components/PreviewText';
+import PreviewText from '../components/PreviewText.vue';
 
 function isPdf(file) {
     return file.name.substring(file.name.length - 3).toLowerCase() === 'pdf';
@@ -61,6 +61,17 @@ export default {
             this.$router.push('/');
             this.$store.commit('cleanFile');
         },
+        handleRefresh() {
+            this.$nextTick(() => {
+                this.loadPdfPreview();
+            });
+        },
+        async loadPdfPreview() {
+            const { file } = this.$store.state.currentFile;
+            const { width } = window.getComputedStyle(this.$refs.preview, null);
+            this.previewWidth = Number(width.substring(0, width.length - 2)) - 60;
+            this.pdfPromises = await getPdfPagePromises(file.path);
+        },
         async sendFile(device) {
             await sendFileToAnotherDevice({
                 info: this.$store.state.currentFile.info,
@@ -75,16 +86,17 @@ export default {
         this.socket.on('newfile', (res) => {
             console.log(res);
         });
-        this.socket.on('updateDevicesList', (devices) => {
-            this.devices = devices;
+        this.socket.on('pushDevice', (pushedDevice) => {
+            this.devices.push(pushedDevice);
+        });
+        this.socket.on('popDevice', (popedDevice) => {
+            this.devices = this.devices.filter(item => item.device_id !== popedDevice.device_id);
         });
     },
     async mounted() {
         const { file } = this.$store.state.currentFile;
         if (isPdf(file)) {
-            const { width } = window.getComputedStyle(this.$refs.preview, null);
-            this.previewWidth = Number(width.substring(0, width.length - 2)) - 60;
-            this.pdfPromises = await getPdfPagePromises(file.path);
+            await this.loadPdfPreview();
         }
     },
 };

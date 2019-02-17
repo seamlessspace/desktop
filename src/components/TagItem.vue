@@ -1,9 +1,11 @@
 <template>
-    <div class="card" :class="{'card--active': active}">
+    <div class="card" :class="{'card--active': active}" @click="selectFile">
         <header class="header">
             <img class="header__icon" src="../assets/image/icon/pdf.png" v-if="isPdfFile" />
             <img class="header__icon" src="../assets/image/icon/txt.png" v-else />
-            <p class="header__title" :class="{'header__title--active': active}">{{file.name}}</p>
+            <p class="header__title" :class="{'header__title--active': active}">
+                {{fileExt.file.name}}
+            </p>
         </header>
         <div class="card__canvas-wrapper">
             <canvas class="card__canvas" ref="canvas" v-if="isPdfFile"></canvas>
@@ -28,26 +30,32 @@ export default {
         };
     },
     props: {
-        file: File,
+        fileExt: Object,
         active: Boolean,
+    },
+    methods: {
+        selectFile() {
+            this.$store.commit('openFile', this.fileExt);
+            this.$emit('refresh');
+        },
     },
     computed: {
         isPdfFile() {
-            return getFileType(this.file.name) === 'pdf';
+            return getFileType(this.fileExt.file.name) === 'pdf';
         },
     },
     async mounted() {
-        const isPdfFile = getFileType(this.file.name) === 'pdf';
+        const isPdfFile = getFileType(this.fileExt.file.name) === 'pdf';
         if (isPdfFile) {
             const style = window.getComputedStyle(this.$refs.canvas, null);
             await getPdfPage({
-                filePath: this.file.path,
+                filePath: this.fileExt.file.path,
                 canvas: this.$refs.canvas,
                 canvasWidth: parseInt(style.width, 10),
                 canvasHeight: parseInt(style.height, 10),
             });
         } else {
-            this.txtContent = await readTxt(this.file.path);
+            this.txtContent = await readTxt(this.fileExt.file.path);
         }
     },
 };
@@ -56,7 +64,7 @@ export default {
 <style lang="scss" scoped>
     .card {
         background-color: #f0f0f0;
-        max-height: 250px;
+        max-height: 200px;
         margin-top: 10px;
         padding: 8px;
         border-radius: 5px;
@@ -98,7 +106,7 @@ export default {
     }
 
     .card__txt {
-        max-height: 200px;
+        max-height: 150px;
         background-color: white;
         word-break: break-all;
         font-family: 'Consolas', monospace;
