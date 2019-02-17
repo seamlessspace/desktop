@@ -24,8 +24,8 @@ export default new Vuex.Store({
         openFile(state, fileExt) {
             state.currentFile = fileExt;
         },
-        updateFilePage(state, pageNumber) {
-            state.currentFile.info.file_state = pageNumber;
+        updateFileState(state, fileState) {
+            state.currentFile.info.file_state = fileState;
         },
         cleanFile(state) {
             state.currentFile = null;

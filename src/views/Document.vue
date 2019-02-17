@@ -26,7 +26,9 @@
                               :page-promise="promise" :key="index"></preview-page>
             </div>
             <div class="preview" v-else>
-                <preview-text :fileExt="$store.state.currentFile"></preview-text>
+                <preview-text :key="$store.state.currentFile.file.name"
+                              :fileExt="$store.state.currentFile"
+                              @updatecursor="updateFileState"></preview-text>
             </div>
         </main>
         <div class="devices" v-if="sendActive">
@@ -61,7 +63,6 @@ export default {
             devices: null,
             sendActive: false,
             previewWidth: 0,
-            cursorPos: -1,
             pdfPromises: [],
         };
     },
@@ -86,6 +87,9 @@ export default {
             this.$nextTick(() => {
                 this.loadPdfPreview();
             });
+        },
+        updateFileState(cursorPos) {
+            this.$store.commit('updateFileState', cursorPos);
         },
         async loadPdfPreview() {
             const { file } = this.$store.state.currentFile;

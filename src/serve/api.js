@@ -42,14 +42,15 @@ async function getFileWithId(id) {
 }
 
 async function sendFileToAnotherDevice(params) {
+    console.log(params);
     const res = await axios({
         url: `${BASE_URL}${URL_ADDRESSES.DEVICE}`,
         method: 'POST',
         data: {
             device_id: params.device_id,
             file_id: params.info.file_id,
-            file_state: params.info.file_state || {
-                cursor: -1,
+            file_state: {
+                cursor: params.info.file_state,
             },
         },
     });
