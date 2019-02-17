@@ -1,5 +1,6 @@
 <template>
-    <div class="card" :class="{'card--active': active}" @click="selectFile">
+    <div class="card" :class="{'card--active': active}" ref="card" @click="selectFile"
+         @mousedown="handleDragStart" @mousemove="handleDragMove" @mouseup="handleDragEnd">
         <header class="header">
             <img class="header__icon" src="../assets/image/icon/pdf.png" v-if="isPdfFile" />
             <img class="header__icon" src="../assets/image/icon/txt.png" v-else />
@@ -27,6 +28,9 @@ export default {
     data() {
         return {
             txtContent: '',
+            isMoving: false,
+            width: 0,
+            height: 0,
         };
     },
     props: {
@@ -35,8 +39,38 @@ export default {
     },
     methods: {
         selectFile() {
+            const oldFileExt = this.$store.state.currentFile;
             this.$store.commit('openFile', this.fileExt);
-            this.$emit('refresh');
+            this.$emit('refresh', oldFileExt);
+        },
+        handleDragStart(event) {
+            this.selectFile();
+            this.$emit('start');
+            console.log('start');
+            this.isMoving = true;
+            const style = window.getComputedStyle(this.$refs.card, null);
+            this.width = Number(style.width.substring(0, style.width.length - 2));
+            this.height = Number(style.height.substring(0, style.height.length - 2));
+            this.$refs.card.style.left = `${event.clientX - this.width / 2}px`;
+            this.$refs.card.style.top = `${event.clientY - this.height / 2}px`;
+            this.$refs.card.style.position = 'fixed';
+        },
+        handleDragMove(event) {
+            if (!this.isMoving) {
+                return;
+            }
+            console.log('move');
+            this.$refs.card.style.left = `${event.clientX - this.width / 2}px`;
+            this.$refs.card.style.top = `${event.clientY - this.height / 2}px`;
+        },
+        handleDragEnd(event) {
+            console.log('end');
+            this.isMoving = false;
+            this.$refs.card.style.position = 'static';
+            this.$refs.card.style.left = '0';
+            this.$refs.card.style.top = '0';
+            this.width = 0;
+            this.height = 0;
         },
     },
     computed: {

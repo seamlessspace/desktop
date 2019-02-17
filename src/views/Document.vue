@@ -61,7 +61,10 @@ export default {
             this.$router.push('/');
             this.$store.commit('cleanFile');
         },
-        handleRefresh() {
+        handleRefresh(fileExt) {
+            if (fileExt !== this.$store.state.currentFile) {
+                this.pdfPromises = [];
+            }
             this.$nextTick(() => {
                 this.loadPdfPreview();
             });
