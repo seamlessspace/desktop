@@ -6,34 +6,49 @@
             <p class="header__title" :class="{'header__title--active': active}">{{file.name}}</p>
         </header>
         <div class="card__canvas-wrapper">
-            <canvas class="card__canvas" ref="canvas"></canvas>
+            <canvas class="card__canvas" ref="canvas" v-if="isPdfFile"></canvas>
+            <p class="card__txt" v-else></p>
         </div>
     </div>
 </template>
 
 <script>
 import { getPdfPage } from '../utils/loadPdf';
+import { readTxt } from '../serve/api';
+
+function getFileType(fileName) {
+    return fileName.substring(fileName.length - 3).toLowerCase();
+}
 
 export default {
     name: 'TagItem',
+    data() {
+        return {
+            txtContent: '',
+        };
+    },
     props: {
         file: File,
         active: Boolean,
     },
     computed: {
         isPdfFile() {
-            const suffix = this.file.name.substring(this.file.name.length - 3).toLowerCase();
-            return suffix === 'pdf';
+            return getFileType(this.file.name) === 'pdf';
         },
     },
     async mounted() {
-        const style = window.getComputedStyle(this.$refs.canvas, null);
-        await getPdfPage({
-            filePath: this.file.path,
-            canvas: this.$refs.canvas,
-            canvasWidth: parseInt(style.width, 10),
-            canvasHeight: parseInt(style.height, 10),
-        });
+        const isPdfFile = getFileType(this.file.name) === 'pdf';
+        if (isPdfFile) {
+            const style = window.getComputedStyle(this.$refs.canvas, null);
+            await getPdfPage({
+                filePath: this.file.path,
+                canvas: this.$refs.canvas,
+                canvasWidth: parseInt(style.width, 10),
+                canvasHeight: parseInt(style.height, 10),
+            });
+        } else {
+            this.txtContent = await readTxt(this.file.path);
+        }
     },
 };
 </script>
@@ -78,5 +93,10 @@ export default {
     .card__canvas {
         width: inherit;
         height: inherit;
+    }
+
+    .card__txt {
+        word-break: break-all;
+        font-family: 'Consolas', monospace;
     }
 </style>

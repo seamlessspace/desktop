@@ -34,5 +34,6 @@ export default {
 
     .doc__list {
         display: flex;
+        margin-top: 10px;
     }
 </style>

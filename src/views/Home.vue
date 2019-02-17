@@ -1,14 +1,15 @@
 <template>
     <div class="home">
         <nav-bar></nav-bar>
-        <doc-list type="pdf" :files="$store.state.files.pdf"></doc-list>
+        <doc-list type="PDF" :files="$store.state.files.pdf"></doc-list>
+        <doc-list type="TXT" :files="$store.state.files.txt"></doc-list>
     </div>
 </template>
 
 <script>
 import NavBar from '../components/NavBar.vue';
 import DocList from '../components/DocList.vue';
-import { uploadFile } from '../serve/api';
+import { uploadFile, readTxt } from '../serve/api';
 
 function getSuffix(file) {
     const afterSplit = file.name.split('.');

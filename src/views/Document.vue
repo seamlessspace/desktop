@@ -11,11 +11,15 @@
                 <p class="list__counter">
                     Opened Tags ({{$store.state.files.pdf.length + $store.state.files.txt.length}})
                 </p>
-                <tag-item v-for="(fileExt, index) in $store.state.files.pdf" :file="fileExt.file"
-                          :active="fileExt === $store.state.currentFile" :key="index">
+                <tag-item v-for="(pdfFileExt, pdfIndex) in $store.state.files.pdf"
+                          :file="pdfFileExt.file" :active="pdfFileExt === $store.state.currentFile"
+                          :key="pdfIndex">
                 </tag-item>
+                <tag-item v-for="(txtFileExt, txtIndex) in $store.state.files.txt"
+                          :file="txtFileExt.file" :active="txtFileExt === $store.state.currentFile"
+                          :key="txtIndex + $store.state.file.pdf.length"></tag-item>
             </aside>
-            <div class="preview" ref="preview">
+            <div class="preview" ref="preview" v-if="isPdfFile($store.state.currentFile.file)">
                 <preview-page v-for="(promise, index) in pdfPromises" :width="previewWidth"
                               :page-promise="promise" :key="index"></preview-page>
             </div>
@@ -42,6 +46,9 @@ export default {
         };
     },
     methods: {
+        isPdfFile(file) {
+            return file.name.substring(file.name.length - 3).toLowerCase() === 'pdf';
+        },
         returnHome() {
             this.$router.push('/');
             this.$store.commit('cleanFile');
