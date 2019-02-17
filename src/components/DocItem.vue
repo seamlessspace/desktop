@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import getPdfPage from '../utils/loadPdf';
+import { getPdfPage } from '../utils/loadPdf';
 
 export default {
     name: 'DocItem',
@@ -33,7 +33,6 @@ export default {
         const { file } = this.fileExt;
         getPdfPage({
             filePath: file.path,
-            pageNumber: 1,
             canvas: this.$refs.doc,
             canvasWidth: 250,
             canvasHeight: 250,
