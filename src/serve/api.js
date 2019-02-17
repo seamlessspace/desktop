@@ -4,10 +4,11 @@ import BASE_URL from './config';
 
 const URL_ADDRESSES = {
     DEVICES: '/devices',
+    DEVICE: '/device',
     FILE: '/file',
 };
 
-async function getAllDevices(params) {
+async function getAllDevices() {
     const res = await axios.get(`${BASE_URL}${URL_ADDRESSES.DEVICES}`);
     return res;
 }
@@ -23,7 +24,21 @@ async function uploadFile(file) {
     return res;
 }
 
+async function sendFileToAnotherDevice(params) {
+    const res = await axios({
+        url: `${BASE_URL}${URL_ADDRESSES.DEVICE}`,
+        method: 'POST',
+        data: {
+            device_id: params.device_id,
+            file_id: params.info.file_id,
+            file_state: params.info.file_state,
+        },
+    });
+    return res;
+}
+
 export {
     getAllDevices,
     uploadFile,
+    sendFileToAnotherDevice,
 };

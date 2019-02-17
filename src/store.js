@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { uploadFile } from './serve/api';
 
 Vue.use(Vuex);
 
@@ -24,6 +23,12 @@ export default new Vuex.Store({
         },
         openFile(state, fileExt) {
             state.currentFile = fileExt;
+        },
+        updateFilePage(state, pageNumber) {
+            state.currentFile.info.file_state = pageNumber;
+        },
+        cleanFile(state) {
+            state.currentFile = null;
         },
     },
     actions: {

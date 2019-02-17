@@ -55,6 +55,7 @@ export default {
         border: 1px solid #707070;
         border-radius: 5px;
         overflow: hidden;
+        margin-right: 20px;
     }
 
     .card__thumbnail {

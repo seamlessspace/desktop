@@ -2,17 +2,16 @@
     <div>
         <nav class="nav">
             <font-awesome-icon :icon="['fas', 'chevron-left']" class="nav__back"
-                               @click="$router.push('/')">
+                               @click="returnHome">
             </font-awesome-icon>
             <h1 class="nav__title">Learn Space</h1>
         </nav>
-        <canvas ref="doc"></canvas>
     </div>
 </template>
 
 <script>
 import createSocket from '../serve/socket';
-import { getAllDevices, uploadFile } from '../serve/api';
+import { getAllDevices, sendFileToAnotherDevice } from '../serve/api';
 
 export default {
     name: 'Document',
@@ -22,8 +21,25 @@ export default {
             devices: null,
         };
     },
-    created() {
-        // this.socket = createSocket();
+    methods: {
+        returnHome() {
+            this.$router.push('/');
+            this.$store.commit('cleanFile');
+        },
+        async sendFile(device) {
+            await sendFileToAnotherDevice({
+                info: this.$store.state.currentFile.info,
+                device_id: device.device_id,
+            });
+        },
+    },
+    async created() {
+        const getDevicesRes = await getAllDevices();
+        this.devices = getDevicesRes.data;
+        this.socket = createSocket();
+        this.socket.on('newfile', (res) => {
+            console.log(res);
+        });
     },
 };
 </script>
