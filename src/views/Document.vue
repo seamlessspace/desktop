@@ -13,11 +13,13 @@
                 </p>
                 <tag-item v-for="(pdfFileExt, pdfIndex) in $store.state.files.pdf"
                           :file-ext="pdfFileExt" :active="pdfFileExt === $store.state.currentFile"
-                          :key="pdfIndex" @refresh="handleRefresh">
+                          :key="pdfIndex" @refresh="handleRefresh" @startsend="handleStartSend"
+                          @endsend="handleEndSend">
                 </tag-item>
                 <tag-item v-for="(txtFileExt, txtIndex) in $store.state.files.txt"
                           :file-ext="txtFileExt" :active="txtFileExt === $store.state.currentFile"
-                          :key="txtIndex + $store.state.files.pdf.length"></tag-item>
+                          :key="txtIndex + $store.state.files.pdf.length"
+                          @startsend="handleStartSend" @endsend="handleEndSend"></tag-item>
             </aside>
             <div class="preview" ref="preview" v-if="isPdfFile($store.state.currentFile.file)">
                 <preview-page v-for="(promise, index) in pdfPromises" :width="previewWidth"
@@ -27,16 +29,22 @@
                 <preview-text :fileExt="$store.state.currentFile"></preview-text>
             </div>
         </main>
+        <div class="devices" v-if="sendActive">
+            <device v-for="device in devices" :device="device" :key="device.device_id"></device>
+        </div>
     </div>
 </template>
 
 <script>
 import createSocket from '../serve/socket';
-import { getAllDevices, sendFileToAnotherDevice } from '../serve/api';
+import BASE_URL from '../serve/config';
+import { getAllDevices, sendFileToAnotherDevice, getFileWithId } from '../serve/api';
 import { getPdfPagePromises } from '../utils/loadPdf';
 import TagItem from '../components/TagItem.vue';
 import PreviewPage from '../components/PreviewPage.vue';
 import PreviewText from '../components/PreviewText.vue';
+import Device from '../components/Device.vue';
+import downloadFile from '../utils/downloadFile';
 
 function isPdf(file) {
     return file.name.substring(file.name.length - 3).toLowerCase() === 'pdf';
@@ -44,12 +52,16 @@ function isPdf(file) {
 
 export default {
     name: 'Document',
-    components: { PreviewText, PreviewPage, TagItem },
+    components: {
+        Device, PreviewText, PreviewPage, TagItem,
+    },
     data() {
         return {
             socket: null,
             devices: null,
+            sendActive: false,
             previewWidth: 0,
+            cursorPos: -1,
             pdfPromises: [],
         };
     },
@@ -60,6 +72,12 @@ export default {
         returnHome() {
             this.$router.push('/');
             this.$store.commit('cleanFile');
+        },
+        handleStartSend() {
+            this.sendActive = true;
+        },
+        handleEndSend() {
+            this.sendActive = false;
         },
         handleRefresh(fileExt) {
             if (fileExt !== this.$store.state.currentFile) {
@@ -86,8 +104,20 @@ export default {
         const getDevicesRes = await getAllDevices();
         this.devices = getDevicesRes.data;
         this.socket = createSocket();
-        this.socket.on('newfile', (res) => {
-            console.log(res);
+        this.socket.on('newFile', async (res) => {
+            const requestFileRes = await getFileWithId(res.file_id);
+            const fileUrl = `${BASE_URL}${requestFileRes.data.file_path}`;
+            const fileName = requestFileRes.data.file_name;
+            const localPath = await downloadFile(fileUrl, fileName);
+            const newFile = {
+                file: {
+                    path: localPath,
+                    name: fileName,
+                },
+            };
+            this.$store.commit('addFile', newFile);
+            this.$store.commit('openFile', newFile);
+            this.handleRefresh();
         });
         this.socket.on('pushDevice', (pushedDevice) => {
             this.devices.push(pushedDevice);
@@ -167,5 +197,15 @@ export default {
         min-width: 800px;
         background-color: black;
         padding: 0 10px;
+    }
+
+    .devices {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 </style>

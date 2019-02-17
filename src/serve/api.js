@@ -36,6 +36,11 @@ async function uploadFile(file) {
     return res;
 }
 
+async function getFileWithId(id) {
+    const res = await axios.get(`${BASE_URL}${URL_ADDRESSES.FILE}?file_id=${id}`);
+    return res;
+}
+
 async function sendFileToAnotherDevice(params) {
     const res = await axios({
         url: `${BASE_URL}${URL_ADDRESSES.DEVICE}`,
@@ -43,7 +48,9 @@ async function sendFileToAnotherDevice(params) {
         data: {
             device_id: params.device_id,
             file_id: params.info.file_id,
-            file_state: params.info.file_state,
+            file_state: params.info.file_state || {
+                cursor: -1,
+            },
         },
     });
     return res;
@@ -54,4 +61,5 @@ export {
     getAllDevices,
     uploadFile,
     sendFileToAnotherDevice,
+    getFileWithId,
 };

@@ -5,6 +5,9 @@ import {
     faSearch,
     faEllipsisV,
     faChevronLeft,
+    faLaptop,
+    faTabletAlt,
+    faMobileAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import App from './App.vue';
 import router from './router';
@@ -14,6 +17,9 @@ library.add(
     faSearch,
     faEllipsisV,
     faChevronLeft,
+    faLaptop,
+    faTabletAlt,
+    faMobileAlt,
 );
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);

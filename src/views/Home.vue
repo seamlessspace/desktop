@@ -10,6 +10,7 @@
 import NavBar from '../components/NavBar.vue';
 import DocList from '../components/DocList.vue';
 import { uploadFile, readTxt } from '../serve/api';
+import downloadFile from '../utils/downloadFile';
 
 function getSuffix(file) {
     const afterSplit = file.name.split('.');

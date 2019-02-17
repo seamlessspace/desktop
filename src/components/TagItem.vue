@@ -1,6 +1,6 @@
 <template>
     <div class="card" :class="{'card--active': active}" ref="card" @click="selectFile"
-         @mousedown="handleDragStart" @mousemove="handleDragMove" @mouseup="handleDragEnd">
+         @mousedown="handleDragStart">
         <header class="header">
             <img class="header__icon" src="../assets/image/icon/pdf.png" v-if="isPdfFile" />
             <img class="header__icon" src="../assets/image/icon/txt.png" v-else />
@@ -45,8 +45,7 @@ export default {
         },
         handleDragStart(event) {
             this.selectFile();
-            this.$emit('start');
-            console.log('start');
+            this.$emit('startsend');
             this.isMoving = true;
             const style = window.getComputedStyle(this.$refs.card, null);
             this.width = Number(style.width.substring(0, style.width.length - 2));
@@ -59,12 +58,11 @@ export default {
             if (!this.isMoving) {
                 return;
             }
-            console.log('move');
             this.$refs.card.style.left = `${event.clientX - this.width / 2}px`;
             this.$refs.card.style.top = `${event.clientY - this.height / 2}px`;
         },
         handleDragEnd(event) {
-            console.log('end');
+            this.$emit('endsend');
             this.isMoving = false;
             this.$refs.card.style.position = 'static';
             this.$refs.card.style.left = '0';
@@ -77,6 +75,11 @@ export default {
         isPdfFile() {
             return getFileType(this.fileExt.file.name) === 'pdf';
         },
+    },
+    created() {
+        const { body } = document;
+        body.addEventListener('mousemove', this.handleDragMove);
+        body.addEventListener('mouseup', this.handleDragEnd);
     },
     async mounted() {
         const isPdfFile = getFileType(this.fileExt.file.name) === 'pdf';
@@ -99,6 +102,7 @@ export default {
     .card {
         background-color: #f0f0f0;
         max-height: 200px;
+        max-width: 300px;
         margin-top: 10px;
         padding: 8px;
         border-radius: 5px;
