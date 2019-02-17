@@ -7,7 +7,7 @@
         </header>
         <div class="card__canvas-wrapper">
             <canvas class="card__canvas" ref="canvas" v-if="isPdfFile"></canvas>
-            <p class="card__txt" v-else></p>
+            <p class="card__txt" v-else>{{txtContent}}</p>
         </div>
     </div>
 </template>
@@ -56,9 +56,11 @@ export default {
 <style lang="scss" scoped>
     .card {
         background-color: #f0f0f0;
+        max-height: 250px;
         margin-top: 10px;
         padding: 8px;
         border-radius: 5px;
+        overflow: hidden;
     }
 
     .card--active {
@@ -96,7 +98,11 @@ export default {
     }
 
     .card__txt {
+        max-height: 200px;
+        background-color: white;
         word-break: break-all;
         font-family: 'Consolas', monospace;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>

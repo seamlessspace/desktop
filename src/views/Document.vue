@@ -17,11 +17,14 @@
                 </tag-item>
                 <tag-item v-for="(txtFileExt, txtIndex) in $store.state.files.txt"
                           :file="txtFileExt.file" :active="txtFileExt === $store.state.currentFile"
-                          :key="txtIndex + $store.state.file.pdf.length"></tag-item>
+                          :key="txtIndex + $store.state.files.pdf.length"></tag-item>
             </aside>
             <div class="preview" ref="preview" v-if="isPdfFile($store.state.currentFile.file)">
                 <preview-page v-for="(promise, index) in pdfPromises" :width="previewWidth"
                               :page-promise="promise" :key="index"></preview-page>
+            </div>
+            <div class="preview" v-else>
+                <preview-text :fileExt="$store.state.currentFile"></preview-text>
             </div>
         </main>
     </div>
@@ -33,10 +36,15 @@ import { getAllDevices, sendFileToAnotherDevice } from '../serve/api';
 import { getPdfPagePromises } from '../utils/loadPdf';
 import TagItem from '../components/TagItem.vue';
 import PreviewPage from '../components/PreviewPage.vue';
+import PreviewText from '../components/PreviewText';
+
+function isPdf(file) {
+    return file.name.substring(file.name.length - 3).toLowerCase() === 'pdf';
+}
 
 export default {
     name: 'Document',
-    components: { PreviewPage, TagItem },
+    components: { PreviewText, PreviewPage, TagItem },
     data() {
         return {
             socket: null,
@@ -72,10 +80,12 @@ export default {
         });
     },
     async mounted() {
-        const filePath = this.$store.state.currentFile.file.path;
-        const { width } = window.getComputedStyle(this.$refs.preview, null);
-        this.previewWidth = Number(width.substring(0, width.length - 2)) - 60;
-        this.pdfPromises = await getPdfPagePromises(filePath);
+        const { file } = this.$store.state.currentFile;
+        if (isPdf(file)) {
+            const { width } = window.getComputedStyle(this.$refs.preview, null);
+            this.previewWidth = Number(width.substring(0, width.length - 2)) - 60;
+            this.pdfPromises = await getPdfPagePromises(file.path);
+        }
     },
 };
 </script>
